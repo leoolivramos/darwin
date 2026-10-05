@@ -1,4 +1,4 @@
-﻿"""
+"""
 conftest.py — configura sys.path para que os testes unitários possam importar
 módulos dos serviços (detector, generator, evaluator, orchestrator) diretamente,
 replicando o ambiente de execução dos containers Docker.
@@ -28,7 +28,10 @@ def load_service():
     (models, state, ...) que existem em vários serviços.
     Uso: generator = load_service("generator", "generator")
     """
+    from prometheus_client import REGISTRY
+
     added = []
+    collectors_before = set(REGISTRY._collector_to_names)
 
     def _load(service: str, module: str):
         path = os.path.join(os.path.dirname(_base), service)
@@ -38,6 +41,9 @@ def load_service():
         return importlib.import_module(module)
 
     yield _load
+
+    for collector in set(REGISTRY._collector_to_names) - collectors_before:
+        REGISTRY.unregister(collector)
 
     for path, saved in reversed(added):
         if path in sys.path:

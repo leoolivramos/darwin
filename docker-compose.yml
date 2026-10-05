@@ -172,6 +172,20 @@ services:
     networks:
       - codigo-vivo-net
 
+  sandbox-runner:
+    build: ./sandbox-runner
+    container_name: codigo-vivo-sandbox-runner
+    ports:
+      - "9091:9091"
+    environment:
+      - REPO_PATH=/repo
+      - SANDBOX_DEFAULT_ENDPOINTS=/hello,/slow
+    volumes:
+      - ./repo:/repo:ro
+      - maven_cache:/root/.m2
+    networks:
+      - codigo-vivo-net
+
   telemetry-agent:
     build: ./telemetry-agent
     container_name: codigo-vivo-telemetry-agent
@@ -208,3 +222,4 @@ volumes:
   minio_data:
   redis_data:
   postgres_data:
+  maven_cache:
