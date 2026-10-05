@@ -123,12 +123,14 @@ services:
       - "5002:5002"
     environment:
       - REPO_PATH=/repo
+      - APP_SOURCE_PATH=/app-src
       - DETECTOR_URL=http://detector:5004
       - EVALUATOR_URL=http://evaluator:5001
       - ORCHESTRATOR_URL=http://orchestrator:5003
       - LOG_LEVEL=INFO
     volumes:
       - ./repo:/repo
+      - ./app:/app-src:ro
     networks:
       - codigo-vivo-net
     depends_on:

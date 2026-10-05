@@ -3,104 +3,138 @@ from datetime import datetime
 from fastapi import FastAPI, Response, HTTPException
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
-from models import GenerationRequest, PatchResult, HotspotType
-from utils.git_helper import GitHelper
+from models import (
+    GenerationRequest, PatchResult, HotspotType, PromoteRequest, RollbackRequest,
+)
+from utils.git_helper import GitHelper, GitError, NoChanges
 from utils.ast_parser import ASTParser
-from utils.patch_writer import PatchWriter
+from utils.guard import find_protected
 from utils.logger import get_logger
 
-from heuristics.timeout_rule import apply_timeout_rule
-from heuristics.pool_size_rule import apply_pool_size_rule
-from heuristics.caching_rule import apply_caching_rule
+from heuristics.base import RuleNotApplicable
+from heuristics.timeout_rule import plan_timeout
+from heuristics.pool_size_rule import plan_pool_size
+from heuristics.caching_rule import plan_caching
 
-app = FastAPI(title="Código Vivo - Patch Generator", version="1.0.0")
+app = FastAPI(title="Código Vivo - Patch Generator", version="1.1.0")
 logger = get_logger("generator")
 
 REPO_PATH = os.getenv("REPO_PATH", "/repo")
 git = GitHelper(repo_path=REPO_PATH)
 parser = ASTParser(repo_path=REPO_PATH)
-patch_writer = PatchWriter(repo_path=REPO_PATH)
+
+RULES = {
+    "caching": plan_caching,
+    "timeout": plan_timeout,
+    "pool_size": plan_pool_size,
+}
+
+# Ordem de tentativa por tipo de hotspot: usa a primeira regra aplicável.
+RULES_BY_HOTSPOT = {
+    HotspotType.LATENCY: ["caching", "timeout", "pool_size"],
+    HotspotType.CPU_USAGE: ["pool_size", "caching"],
+    HotspotType.ERROR_RATE: ["timeout"],
+}
 
 
-def select_rule_for_hotspot(hotspot_type: HotspotType):
-    """
-    Mapeamento determinístico entre tipo de hotspot e regra de heurística.
-    - latency    → caching (primeira opção) ou timeout
-    - cpu_usage  → pool_size
-    - error_rate → timeout
-    """
-    if hotspot_type == HotspotType.LATENCY:
-        return "caching", apply_caching_rule
-    elif hotspot_type == HotspotType.CPU_USAGE:
-        return "pool_size", apply_pool_size_rule
-    elif hotspot_type == HotspotType.ERROR_RATE:
-        return "timeout", apply_timeout_rule
-    return "timeout", apply_timeout_rule
+def rules_for_hotspot(hotspot_type: HotspotType) -> list:
+    """Regras candidatas (em ordem de prioridade) para o tipo de hotspot."""
+    return RULES_BY_HOTSPOT.get(hotspot_type, ["timeout"])
 
 
 @app.get("/health")
-async def health():
+def health():
     return {
         "status": "healthy",
         "service": "generator",
         "repo_path": REPO_PATH,
+        "repo_ready": git.has_commits(),
         "timestamp": datetime.now().isoformat(),
     }
 
 
 @app.post("/generate", response_model=PatchResult)
-async def generate_patch(payload: GenerationRequest):
+def generate_patch(payload: GenerationRequest):
     """
-    Gera um patch de código candidato com base em um hotspot recebido.
-    1. Identifica o hotspot principal.
-    2. Seleciona a heurística apropriada.
-    3. Localiza o arquivo Java correspondente via ASTParser.
-    4. Aplica a heurística e salva o patch via PatchWriter.
-    5. Cria um branch git candidato.
+    Gera um patch real para o hotspot recebido:
+      1. Localiza o arquivo Java que atende o endpoint.
+      2. Tenta as heurísticas aplicáveis ao tipo de hotspot.
+      3. Bloqueia mudanças em módulos críticos (revisão humana).
+      4. Cria um branch git `darwin/*` com o commit do patch.
     """
     logger.info(f"🧠 Solicitação de geração recebida: {len(payload.hotspots)} hotspot(s)")
 
     if not payload.hotspots:
         raise HTTPException(status_code=400, detail="Nenhum hotspot fornecido no payload.")
+    if not git.has_commits():
+        raise HTTPException(status_code=503, detail="Repositório de código vazio (APP_SOURCE_PATH não semeado).")
 
     hotspot = payload.hotspots[0]
-    rule_name, rule_fn = select_rule_for_hotspot(hotspot.type)
-    logger.info(f"🎯 Hotspot: type={hotspot.type} endpoint={hotspot.endpoint} → Regra: {rule_name}")
+    hotspot_dict = hotspot.model_dump(mode="json")
 
-    file_path = parser.find_relevant_file(hotspot.model_dump())
+    file_path = parser.find_relevant_file(hotspot_dict)
     if not file_path:
-        # Se não encontrar arquivo Java específico, tenta um fallback inteligente
-        file_path = os.path.join(REPO_PATH, "src/main/java/com/example/codigovivo/controller/SampleController.java")
-        if not os.path.exists(file_path):
-            # Em ambiente isolado sem repo clonado, cria arquivo dummy para teste
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write('package com.example.codigovivo.controller;\n\npublic class SampleController {\n    public String getData() {\n        return "data";\n    }\n}\n')
+        return PatchResult(status="no_applicable_rule", message="Nenhum arquivo Java relevante encontrado no repositório.")
 
-    try:
-        modified_code = rule_fn(file_path)
-        patch_file = patch_writer.write_patch(file_path, modified_code)
-        branch_name = git.create_candidate_branch(patch_file, rule=rule_name)
+    reasons = []
+    for rule_name in rules_for_hotspot(hotspot.type):
+        try:
+            changes = RULES[rule_name](REPO_PATH, file_path, hotspot_dict)
+        except RuleNotApplicable as e:
+            reasons.append(f"{rule_name}: {e}")
+            continue
 
-        logger.info(f"✅ Candidate branch criado com sucesso: {branch_name}")
+        blocked = find_protected(changes.keys())
+        if blocked:
+            msg = f"Mudança em módulo crítico exige revisão humana: {', '.join(blocked)}"
+            logger.warning(f"🛑 {msg}")
+            return PatchResult(status="blocked", rule_applied=rule_name, message=msg)
+
+        try:
+            result = git.create_candidate_branch(changes, rule=rule_name, cycle_id=payload.cycle_id or "")
+        except NoChanges as e:
+            reasons.append(f"{rule_name}: {e}")
+            continue
+        except GitError as e:
+            logger.error(f"❌ Falha git ao aplicar {rule_name}: {e}")
+            return PatchResult(status="error", rule_applied=rule_name, message=str(e))
+
         return PatchResult(
             status="success",
-            branch=branch_name,
-            file_path=patch_file,
+            branch=result["branch"],
+            commit=result["commit"],
+            file_path=result["files"][0],
+            files=result["files"],
+            diff=result["diff"],
             rule_applied=rule_name,
-            message="Patch gerado e commitado em candidate branch com sucesso.",
+            message="Patch gerado e commitado em branch candidato.",
         )
-    except Exception as e:
-        logger.error(f"❌ Falha ao aplicar heurística {rule_name}: {e}")
-        return PatchResult(
-            status="error",
-            rule_applied=rule_name,
-            message=str(e),
-        )
+
+    message = "Nenhuma heurística aplicável: " + "; ".join(reasons)
+    logger.info(f"ℹ️ {message}")
+    return PatchResult(status="no_applicable_rule", message=message)
+
+
+@app.post("/promote")
+def promote(req: PromoteRequest):
+    """Integra um branch aprovado em `main` e cria a tag de deploy."""
+    try:
+        return {"status": "promoted", **git.promote(req.branch, req.cycle_id or "")}
+    except GitError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
+@app.post("/rollback")
+def rollback(req: RollbackRequest):
+    """Reverte em `main` um commit previamente promovido."""
+    try:
+        return {"status": "rolled_back", **git.rollback(req.commit, req.cycle_id or "")}
+    except GitError as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
 
 @app.get("/metrics")
-async def metrics():
+def metrics():
     data = generate_latest()
     return Response(content=data, media_type=CONTENT_TYPE_LATEST)
 

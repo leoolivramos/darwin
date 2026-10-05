@@ -2,9 +2,10 @@ import os
 import tempfile
 import pytest
 
+from heuristics.base import RuleNotApplicable
 from heuristics.timeout_rule import apply_timeout_rule
-from heuristics.pool_size_rule import apply_pool_size_rule
-from heuristics.caching_rule import apply_caching_rule
+from heuristics.pool_size_rule import apply_pool_size_rule, apply_tomcat_threads
+from heuristics.caching_rule import apply_caching_rule, cache_support_changes
 
 
 def test_apply_timeout_rule_matches_regex():
@@ -26,15 +27,15 @@ def test_apply_timeout_rule_matches_regex():
         os.remove(tmp_path)
 
 
-def test_apply_timeout_rule_fallback():
+def test_apply_timeout_rule_not_applicable():
     sample_code = "public void doSomething() {}"
     with tempfile.NamedTemporaryFile("w+", suffix=".java", delete=False) as tmp:
         tmp.write(sample_code)
         tmp_path = tmp.name
 
     try:
-        modified = apply_timeout_rule(tmp_path)
-        assert "// Darwin Heuristic: Timeout tuning applied" in modified
+        with pytest.raises(RuleNotApplicable):
+            apply_timeout_rule(tmp_path)
     finally:
         os.remove(tmp_path)
 
