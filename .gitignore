@@ -8,3 +8,11 @@ __pycache__/
 
 # Runtime patch repo
 repo/
+
+# Local environment / tooling
+.venv/
+.pytest_cache/
+.coverage
+
+# MinIO runtime data
+infra/minio/data/
