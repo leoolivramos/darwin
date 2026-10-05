@@ -11,6 +11,7 @@ def build_report(result: dict) -> dict:
             "decision": result.get("decision", "reject"),
             "score": result.get("score", 0.0),
             "confidence": result.get("confidence", 0.0),
+            "reason": result.get("reason"),
         },
         "details": {
             "delta_latency_pct": result.get("delta_latency_pct", 0.0),

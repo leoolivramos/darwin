@@ -2,6 +2,25 @@ from utils.logger import get_logger
 
 logger = get_logger("scoring")
 
+# Regressões acima destes limites invalidam o patch, independentemente do score.
+MAX_LATENCY_REGRESSION_PCT = 10.0
+MAX_ERROR_REGRESSION_PCT = 10.0
+MAX_CPU_REGRESSION_PCT = 30.0
+MAX_NEW_ERROR_RATE = 0.01  # erros introduzidos quando o baseline não tinha nenhum
+
+
+def _detect_regression(b_err, c_err, delta_lat, delta_err, delta_cpu):
+    """Retorna a descrição da regressão (ou None) — um patch não pode piorar o sistema."""
+    if b_err == 0 and c_err > MAX_NEW_ERROR_RATE:
+        return f"Patch introduziu erros (error_rate={c_err:.4f}) onde o baseline não tinha"
+    if delta_lat < -MAX_LATENCY_REGRESSION_PCT:
+        return f"Regressão de latência: {delta_lat:.1f}%"
+    if delta_err < -MAX_ERROR_REGRESSION_PCT:
+        return f"Regressão de error rate: {delta_err:.1f}%"
+    if delta_cpu < -MAX_CPU_REGRESSION_PCT:
+        return f"Regressão de CPU: {delta_cpu:.1f}%"
+    return None
+
 
 def evaluate_metrics(baseline: dict, candidate: dict) -> dict:
     """
@@ -44,7 +63,12 @@ def evaluate_metrics(baseline: dict, candidate: dict) -> dict:
     score = round(delta_lat * 0.5 + delta_err * 0.3 + delta_cpu * 0.2, 2)
 
     # Determinar recomendação
-    if score >= 10.0:
+    regression = _detect_regression(b_err, c_err, delta_lat, delta_err, delta_cpu)
+    reason = None
+    if regression:
+        decision = "reject"
+        reason = regression
+    elif score >= 10.0:
         decision = "approve_auto"
     elif score > 0.0:
         decision = "review_manual"
@@ -62,6 +86,7 @@ def evaluate_metrics(baseline: dict, candidate: dict) -> dict:
         "delta_error_pct": round(delta_err, 2),
         "delta_cpu_pct": round(delta_cpu, 2),
         "confidence": confidence,
+        "reason": reason,
         "baseline": baseline,
         "candidate": candidate,
     }
