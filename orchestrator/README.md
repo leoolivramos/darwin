@@ -1,6 +1,6 @@
-# 🧠 Código Vivo – Orchestrator
+# 🧠 Darwin – Orchestrator
 
-O **Orchestrator** é o cérebro do ecossistema **Código Vivo**, coordenando o ciclo completo de autoevolução do sistema.  
+O **Orchestrator** é o cérebro do ecossistema **Darwin**, coordenando o ciclo completo de autoevolução do sistema.  
 Ele atua como um **controlador de fluxo inteligente**, recebendo sinais do `detector/` e acionando dinamicamente os módulos `generator/` e `evaluator/`.
 
 ---
@@ -80,8 +80,8 @@ uvicorn orchestrator:app --reload --port 5003
 
 Docker:
 ```bash
-docker build -t codigo-vivo-orchestrator .
-docker run -p 5003:5003 codigo-vivo-orchestrator
+docker build -t darwin-orchestrator .
+docker run -p 5003:5003 darwin-orchestrator
 ```
 
 ---
@@ -97,4 +97,4 @@ docker run -p 5003:5003 codigo-vivo-orchestrator
 
 ---
 
-O Orchestrator representa a consciência operacional do “Código Vivo”: ele conecta dados, decisões e ações — permitindo que o código aprenda e se ajuste continuamente.
+O Orchestrator representa a consciência operacional do “Darwin”: ele conecta dados, decisões e ações — permitindo que o código aprenda e se ajuste continuamente.

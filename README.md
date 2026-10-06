@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: codigo-vivo-secrets
+  name: darwin-secrets
   namespace: default
 type: Opaque
 stringData:

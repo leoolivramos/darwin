@@ -1,6 +1,6 @@
 # Detector de Hotspots
 
-O Detector de Hotspots é um dos principais módulos do ecossistema Código Vivo. Monitorando continuamente métricas via Prometheus, identifica pontos críticos de performance (hotspots) e envia eventos ao Orchestrator, que decide quando acionar o Generator/Evaluator.
+O Detector de Hotspots é um dos principais módulos do ecossistema Darwin. Monitorando continuamente métricas via Prometheus, identifica pontos críticos de performance (hotspots) e envia eventos ao Orchestrator, que decide quando acionar o Generator/Evaluator.
 
 ---
 

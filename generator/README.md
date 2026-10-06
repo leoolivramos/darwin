@@ -1,4 +1,4 @@
-# 🧠 Código Vivo – Generator
+# 🧠 Darwin – Generator
 
 O **Generator** é o módulo responsável por **propor e aplicar mudanças no código‑fonte**, baseando‑se em heurísticas determinísticas ou em modelos de IA. É o **núcleo evolutivo** do sistema — onde o código “muta” para se adaptar a problemas reais detectados em produção.
 

@@ -46,10 +46,10 @@ python src/telemetry_collector.py
 ### Docker
 
 ```bash
-docker build -t codigo-vivo-telemetry .
+docker build -t darwin-telemetry .
 docker run -e JAEGER_ENDPOINT=http://jaeger:14268/api/traces \
            -e LOKI_ENDPOINT=http://loki:3100 \
-           codigo-vivo-telemetry
+           darwin-telemetry
 ```
 
 ## 📡 Exportadores

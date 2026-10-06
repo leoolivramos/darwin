@@ -1,4 +1,4 @@
-# infra/ — Infraestrutura e Observabilidade do Código Vivo
+# infra/ — Infraestrutura e Observabilidade do Darwin
 
 > Infra local (dev / PoC) e artefatos iniciais para migrar para Kubernetes.
 > Inclui configurações de Prometheus, Grafana, Jaeger, MinIO e manifests básicos de k8s.
@@ -38,7 +38,7 @@ A pasta `infra/` foi planejada para dois cenários:
 1. Desenvolvimento local / PoC: docker compose (arquivo `docker-compose.yml` na raiz) para subir app + Prometheus + Grafana + Jaeger + MinIO.
 2. Deploy em cluster (Kubernetes): manifests iniciais em `infra/k8s/` como ponto de partida.
 
-Objetivo: fornecer observabilidade, armazenamento de artefatos, tracing e facilitar coleta de métricas dos microserviços do Código Vivo.
+Objetivo: fornecer observabilidade, armazenamento de artefatos, tracing e facilitar coleta de métricas dos microserviços do Darwin.
 
 ---
 
@@ -122,7 +122,7 @@ Reinicie o container Prometheus ou envie reload via API se disponível.
 ### Debug / verificação
 - Verificar targets: http://localhost:9090/targets
 - Testar queries: http://localhost:9090/graph
-- Logs do container: `docker logs codigo-vivo-prometheus`
+- Logs do container: `docker logs darwin-prometheus`
 - Validar YAML: `promtool check config infra/prometheus/prometheus.yml`
 
 ---
@@ -176,7 +176,7 @@ mc cp local/file.txt local/artifacts/
 Se não tiver `mc` local, rode dentro de um container temporário:
 
 ```bash
-docker run --rm -it --network codigo-vivo-net minio/mc mc alias set local http://codigo-vivo-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} && mc ls local
+docker run --rm -it --network darwin-net minio/mc mc alias set local http://darwin-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} && mc ls local
 ```
 
 ### Backup / restore
@@ -196,7 +196,7 @@ Pasta `infra/k8s/` contém manifests iniciais:
 Aplique secrets e recursos:
 
 ```bash
-kubectl apply -f infra/k8s/codigo-vivo-secrets.yaml
+kubectl apply -f infra/k8s/darwin-secrets.yaml
 kubectl apply -f infra/k8s/prometheus.yaml
 kubectl apply -f infra/k8s/app-deploy.yaml
 ```
@@ -242,14 +242,14 @@ Ajuste `StorageClass` conforme o provedor (NFS, AWS EBS, GCP PD, etc).
 
 1. Prometheus não sobe / parsing error
      - Use `promtool` para validar `infra/prometheus/prometheus.yml`.
-     - Veja logs: `docker logs codigo-vivo-prometheus`.
+     - Veja logs: `docker logs darwin-prometheus`.
 
 2. Grafana não mostra dados
      - Verifique Prometheus (`curl http://localhost:9090/metrics`).
      - Confira datasource URL (no Compose use `http://prometheus:9090`).
 
 3. MinIO não cria buckets
-     - Logs: `docker logs codigo-vivo-minio`.
+     - Logs: `docker logs darwin-minio`.
      - Verifique permissão de execução de `init.sh` (chmod +x).
      - Confira credenciais no `.env`.
 
@@ -284,7 +284,7 @@ Ver logs:
 
 ```bash
 docker-compose logs -f prometheus
-docker logs -f codigo-vivo-minio
+docker logs -f darwin-minio
 ```
 
 Ver targets do Prometheus:

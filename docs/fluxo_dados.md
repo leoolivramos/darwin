@@ -1,4 +1,4 @@
-# 🔄 Fluxo de Dados — Sistema “Código Vivo”
+# 🔄 Fluxo de Dados — Sistema “Darwin”
 
 ## Visão Resumida
 
@@ -37,7 +37,7 @@ O `orchestrator` recebe o evento de hotspot e repassa para o serviço `generator
 
 ```json
 {
-    "file": "/repo/src/main/java/com/example/codigovivo/config/HttpClientConfig.java",
+    "file": "/repo/src/main/java/com/example/darwin/config/HttpClientConfig.java",
     "reason": "High latency detected in /api/checkout"
 }
 ```

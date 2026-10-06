@@ -1,4 +1,4 @@
-# 🚀 Quick Start — Código Vivo
+# 🚀 Quick Start — Darwin
 
 ## Pré-requisitos
 
@@ -12,7 +12,7 @@
 ### Clone o repositório
 
 ```bash
-git clone <repo-url> codigo-vivo
+git clone <repo-url> darwin
 cd darwin
 ```
 
@@ -58,11 +58,11 @@ minikube start --cpus=4 --memory=8192
 kubectl apply -f infra/k8s/all-in-one.yaml
 
 # Monitorar
-kubectl get pods -n codigo-vivo
-kubectl logs -n codigo-vivo -f deployment/detector
+kubectl get pods -n darwin
+kubectl logs -n darwin -f deployment/detector
 
 # Acesse pelo port-forward
-kubectl port-forward -n codigo-vivo svc/codigo-vivo-app 8080:80
+kubectl port-forward -n darwin svc/darwin-app 8080:80
 ```
 
 ## 3. Acesse os Serviços
@@ -122,7 +122,7 @@ brew install httpd             # macOS
 ab -n 10000 -c 100 http://localhost:8080/api/users
 
 # Observe no Grafana
-# http://localhost:3000 → Dashboards → Código Vivo
+# http://localhost:3000 → Dashboards → Darwin
 ```
 
 ## 6. Monitorar Ciclo de Evolução
@@ -214,8 +214,8 @@ docker-compose up -d --build
 
 ```bash
 # Verifique conectividade
-docker exec codigo-vivo-prometheus \
-  wget -O- http://codigo-vivo-app:8080/actuator/prometheus | head -20
+docker exec darwin-prometheus \
+  wget -O- http://darwin-app:8080/actuator/prometheus | head -20
 ```
 
 ### Generator não encontra repo
@@ -227,8 +227,8 @@ mkdir -p repo/patches repo/artifacts
 # Configure git
 cd repo
 git init
-git config user.email "bot@codigovivo.ai"
-git config user.name "Código Vivo Bot"
+git config user.email "bot@darwin.ai"
+git config user.name "Darwin Bot"
 ```
 
 ### Permissão negada em secrets

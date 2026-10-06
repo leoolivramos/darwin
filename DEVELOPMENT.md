@@ -1,4 +1,4 @@
-# Guia de Desenvolvimento — Código Vivo
+# Guia de Desenvolvimento — Darwin
 
 ## Setup do Ambiente de Desenvolvimento
 
@@ -329,14 +329,14 @@ docker-compose logs | grep ERROR
 
 ```bash
 # Build local
-docker build -t codigo-vivo/detector:dev detector/
-docker build -t codigo-vivo/generator:dev generator/
-docker build -t codigo-vivo/app:dev app/
+docker build -t darwin/detector:dev detector/
+docker build -t darwin/generator:dev generator/
+docker build -t darwin/app:dev app/
 
 # Push para registry
 docker login
-docker tag codigo-vivo/detector:dev seu-registry/codigo-vivo/detector:v1.0
-docker push seu-registry/codigo-vivo/detector:v1.0
+docker tag darwin/detector:dev seu-registry/darwin/detector:v1.0
+docker push seu-registry/darwin/detector:v1.0
 ```
 
 ### Versionamento

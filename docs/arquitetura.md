@@ -1,8 +1,8 @@
-# 🧩 Arquitetura do Sistema — Projeto “Código Vivo”
+# 🧩 Arquitetura do Sistema — Projeto “Darwin”
 
 ## 1. Visão Geral
 
-O **Código Vivo** é um ecossistema distribuído de serviços que simulam o comportamento de um sistema “vivo”, capaz de **monitorar seu desempenho, gerar variações de código, testar hipóteses e evoluir de forma autônoma**.
+O **Darwin** é um ecossistema distribuído de serviços que simulam o comportamento de um sistema “vivo”, capaz de **monitorar seu desempenho, gerar variações de código, testar hipóteses e evoluir de forma autônoma**.
 
 A arquitetura é **modular, desacoplada e containerizada**, construída sobre o conceito de *auto-otimização contínua*.
 

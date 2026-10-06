@@ -1,4 +1,4 @@
-# ⚖️ Código Vivo – Evaluator
+# ⚖️ Darwin – Evaluator
 
 O Evaluator é o módulo responsável por comparar o desempenho entre uma versão baseline e uma versão candidata. Ele analisa métricas como latência, erro e uso de CPU, calcula um score ponderado e decide se a alteração deve ser:
 - `approve_auto` — melhoria significativa e sem erros
@@ -89,8 +89,8 @@ Resposta de exemplo
 
 Build e run com Docker:
 ```bash
-docker build -t codigo-vivo-evaluator .
-docker run -p 5001:5001 codigo-vivo-evaluator
+docker build -t darwin-evaluator .
+docker run -p 5001:5001 darwin-evaluator
 ```
 
 Chamada de avaliação:
