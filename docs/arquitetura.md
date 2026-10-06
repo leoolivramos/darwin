@@ -17,7 +17,7 @@ O sistema é dividido em **quatro camadas principais**:
 | **Runtime & Telemetria** | Executa a aplicação-alvo e coleta métricas de uso. | Spring Boot, Micrometer, Prometheus, Grafana |
 | **Análise & Geração** | Detecta gargalos e cria variações de código candidatas. | Python (FastAPI, JavaParser, GitPython) |
 | **Avaliação & Orquestração** | Testa, avalia e decide quais versões são promovidas. | FastAPI, Pandas, Docker, GitLab CI/CD |
-| **Governança & Observabilidade** | Registra decisões, logs, artefatos e auditoria. | MinIO, Jaeger, Loki, Grafana |
+| **Governança & Observabilidade** | Registra decisões, logs, artefatos e auditoria. | Silo, Jaeger, Loki, Grafana |
 
 ---
 
@@ -93,7 +93,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
     4. Consulta resultados do Evaluator.
     5. Aplica (ou reverte) via Canary Deployment.
 - Implementado em **FastAPI**.
-- Possui logs e trilha de auditoria em **MinIO**.
+- Possui logs e trilha de auditoria em **Silo**.
 
 ---
 
@@ -103,7 +103,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
     - Reprodutibilidade
     - Transparência
     - Possibilidade de rollback
-- Dados são versionados e armazenados no **MinIO** (S3-like storage).
+- Dados são versionados e armazenados no **Silo** (S3-like storage).
 
 ---
 
@@ -116,7 +116,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
 5. O pipeline Sandbox Runner executa testes.  
 6. O Evaluator compara métricas.  
 7. O Orchestrator decide aplicar via Canary Deployment.  
-8. Tudo é registrado no MinIO/Auditor.
+8. Tudo é registrado no Silo/Auditor.
 
 ---
 
@@ -129,7 +129,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
 | Orchestrator | Generator | REST | 5000 | Solicitação de patch |
 | Orchestrator | Evaluator | REST | 5001 | Envio de resultados |
 | Sandbox Runner | Evaluator | REST | 5001 | Métricas de teste |
-| Orchestrator | MinIO | S3 API | 9000 | Logs e snapshots |
+| Orchestrator | Silo | S3 API | 9000 | Logs e snapshots |
 
 ---
 

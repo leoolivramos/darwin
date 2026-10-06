@@ -15,7 +15,7 @@ Detector -> Orchestrator -> Generator -> Sandbox Runner -> Evaluator -> promote 
 5. O **Evaluator** calcula o score. Regressões são sempre rejeitadas.
 6. Patches aprovados são promovidos para `main`. É possível fazer rollback.
 
-Cada ciclo é registrado no Postgres. Diffs e relatórios ficam no MinIO.
+Cada ciclo é registrado no Postgres. Diffs e relatórios ficam no Silo.
 
 ## Serviços
 
@@ -30,7 +30,7 @@ Cada ciclo é registrado no Postgres. Diffs e relatórios ficam no MinIO.
 | Prometheus | 9090 |
 | Grafana | 3000 |
 | Jaeger | 16686 |
-| MinIO (console) | 9001 |
+| Silo (console) | 9001 |
 
 ## Executar
 

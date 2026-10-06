@@ -74,7 +74,7 @@ kubectl port-forward -n darwin svc/darwin-app 8080:80
 | Prometheus       | http://localhost:9090      | -                     |
 | Grafana          | http://localhost:3000      | admin/admin           |
 | Jaeger           | http://localhost:16686     | -                     |
-| MinIO Console    | http://localhost:9001      | minioadmin/minioadmin |
+| Silo Console    | http://localhost:9001      | minioadmin/minioadmin |
 | Detector API     | http://localhost:5004/docs | -                     |
 | Evaluator API    | http://localhost:5001/docs | -                     |
 | Orchestrator API | http://localhost:5003/docs | -                     |

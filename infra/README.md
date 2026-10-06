@@ -1,7 +1,7 @@
 # infra/ — Infraestrutura e Observabilidade do Darwin
 
 > Infra local (dev / PoC) e artefatos iniciais para migrar para Kubernetes.
-> Inclui configurações de Prometheus, Grafana, Jaeger, MinIO e manifests básicos de k8s.
+> Inclui configurações de Prometheus, Grafana, Jaeger, Silo e manifests básicos de k8s.
 
 ## Índice
 - [Visão geral](#visão-geral)
@@ -17,9 +17,9 @@
     - [Importar dashboard JSON](#importar-dashboard-json)
     - [Provisionamento (opcional)](#provisionamento-opcional)
 - [Jaeger (Tracing)](#jaeger-tracing)
-- [MinIO (Object Storage)](#minio-object-storage)
+- [Silo (Object Storage)](#silo-object-storage)
     - [Arquivos importantes](#arquivos-importantes)
-    - [Usando mc (MinIO Client)](#usando-mc-minio-client)
+    - [Usando mcli (client do Silo)](#usando-mcli-client-do-silo)
     - [Backup / restore](#backup--restore)
 - [Kubernetes (k8s)](#kubernetes-k8s)
     - [Secret e PVC](#secret-e-pvc)
@@ -35,7 +35,7 @@
 
 A pasta `infra/` foi planejada para dois cenários:
 
-1. Desenvolvimento local / PoC: docker compose (arquivo `docker-compose.yml` na raiz) para subir app + Prometheus + Grafana + Jaeger + MinIO.
+1. Desenvolvimento local / PoC: docker compose (arquivo `docker-compose.yml` na raiz) para subir app + Prometheus + Grafana + Jaeger + Silo.
 2. Deploy em cluster (Kubernetes): manifests iniciais em `infra/k8s/` como ponto de partida.
 
 Objetivo: fornecer observabilidade, armazenamento de artefatos, tracing e facilitar coleta de métricas dos microserviços do Darwin.
@@ -46,7 +46,7 @@ Objetivo: fornecer observabilidade, armazenamento de artefatos, tracing e facili
 
 - Docker & Docker Compose (ou Docker Desktop)
 - (Opcional) kubectl com acesso a um cluster Kubernetes
-- (Opcional) mc (MinIO Client)
+- (Opcional) mcli (client do Silo)
 - (Opcional) jq (para manipular JSON em CLI)
 - (Opcional) promtool (para validar prometheus.yml)
 
@@ -62,7 +62,7 @@ infra/
 │  └─ dashboards/              # dashboards JSON exportados do Grafana
 ├─ jaeger/
 │  └─ config.yaml              # config mínima para Jaeger all-in-one
-├─ minio/
+├─ silo/
 │  ├─ Dockerfile               # imagem custom (wrapper p/ init)
 │  ├─ init.sh                  # cria buckets (artifacts, telemetry, patches)
 │  └─ data/                    # dados persistidos (montar volume)
@@ -91,8 +91,8 @@ URLs úteis (padrão local):
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000 (admin/admin por padrão)
 - Jaeger UI: http://localhost:16686
-- MinIO Console: http://localhost:9001
-- MinIO S3 API: http://localhost:9000
+- Silo Console: http://localhost:9001
+- Silo S3 API: http://localhost:9000
 
 ---
 
@@ -153,34 +153,34 @@ Verificação: gere uma requisição à API (ex.: `curl http://localhost:8080/ap
 
 ---
 
-## MinIO (Object Storage)
+## Silo (Object Storage)
 
 ### Arquivos importantes
-- `infra/minio/Dockerfile` — imagem que inclui `init.sh`.
-- `infra/minio/init.sh` — cria buckets (artifacts, telemetry, patches).
-- `infra/minio/data/` — diretório usado para persistência (montar volume).
+- Imagem `pgsty/silo` (fork compatível com MinIO), definida em `docker-compose.yml`.
+- Os buckets `artifacts` e `patches` são criados pelo orchestrator no primeiro uso.
+- `infra/silo/data/` — diretório usado para persistência (montar volume).
 
 Console: http://localhost:9001 (credenciais do `.env`)
 S3 API: http://localhost:9000
 
-### Usando mc (MinIO Client)
+### Usando mcli (client do Silo)
 Exemplo:
 
 ```bash
-mc alias set local http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
-mc ls local
-mc mb local/artifacts
-mc cp local/file.txt local/artifacts/
+mcli alias set local http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
+mcli ls local
+mcli mb local/artifacts
+mcli cp local/file.txt local/artifacts/
 ```
 
-Se não tiver `mc` local, rode dentro de um container temporário:
+Rode dentro do container:
 
 ```bash
-docker run --rm -it --network darwin-net minio/mc mc alias set local http://darwin-minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} && mc ls local
+docker exec darwin-silo sh -c 'mcli alias set local http://127.0.0.1:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" && mcli ls local'
 ```
 
 ### Backup / restore
-- Backup simples: compacte `infra/minio/data` (quando volume local).
+- Backup simples: compacte `infra/silo/data` (quando volume local).
 - Em produção, prefira replicação S3 ou snapshot do volume.
 
 ---
@@ -201,13 +201,13 @@ kubectl apply -f infra/k8s/prometheus.yaml
 kubectl apply -f infra/k8s/app-deploy.yaml
 ```
 
-Para MinIO em k8s, crie um PVC e monte em `/data`. Exemplo básico de PVC:
+Para Silo em k8s, crie um PVC e monte em `/data`. Exemplo básico de PVC:
 
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-    name: minio-pvc
+    name: silo-pvc
 spec:
     accessModes:
         - ReadWriteOnce
@@ -224,14 +224,14 @@ Ajuste `StorageClass` conforme o provedor (NFS, AWS EBS, GCP PD, etc).
 
 - Prometheus: configure `infra/prometheus/prometheus.yml` com os nomes dos serviços do Compose ou k8s Services para habilitar scraping.
 - Jaeger: habilite exporter/OpenTelemetry nos serviços.
-- MinIO: configure variáveis `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY` (use `.env` em dev; secrets em produção).
+- Silo: configure variáveis `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY` (use `.env` em dev; secrets em produção).
 - Generator: em compose, monte o código Fonte como volume em `/repo` para permitir edições locais.
 
 ---
 
 ## Segurança e gestão de segredos
 
-- Não commite segredos. `.gitignore` deve incluir `infra/minio/data`, `secrets/`, `.env`.
+- Não commite segredos. `.gitignore` deve incluir `infra/silo/data`, `secrets/`, `.env`.
 - Local: use `.env` montado via `--env-file`.
 - Produção: Docker Secrets (Swarm) ou Kubernetes Secrets.
 - Rotação de credenciais: adote um secrets manager em produção.
@@ -248,8 +248,8 @@ Ajuste `StorageClass` conforme o provedor (NFS, AWS EBS, GCP PD, etc).
      - Verifique Prometheus (`curl http://localhost:9090/metrics`).
      - Confira datasource URL (no Compose use `http://prometheus:9090`).
 
-3. MinIO não cria buckets
-     - Logs: `docker logs darwin-minio`.
+3. Silo não cria buckets
+     - Logs: `docker logs darwin-silo`.
      - Verifique permissão de execução de `init.sh` (chmod +x).
      - Confira credenciais no `.env`.
 
@@ -268,7 +268,7 @@ Ajuste `StorageClass` conforme o provedor (NFS, AWS EBS, GCP PD, etc).
 - Automatize provisioning do Grafana.
 - Em k8s, considere `kube-prometheus-stack` (Helm) para setup robusto.
 - Implementar RBAC, network policies e processo de rotação de segredos.
-- Backups regulares do MinIO (cronjob / snapshot).
+- Backups regulares do Silo (cronjob / snapshot).
 
 ---
 
@@ -284,7 +284,7 @@ Ver logs:
 
 ```bash
 docker-compose logs -f prometheus
-docker logs -f darwin-minio
+docker logs -f darwin-silo
 ```
 
 Ver targets do Prometheus:
@@ -293,11 +293,11 @@ Ver targets do Prometheus:
 curl http://localhost:9090/api/v1/targets | jq
 ```
 
-Listar buckets MinIO com mc:
+Listar buckets Silo com mc:
 
 ```bash
-mc alias set local http://localhost:9000 admin supersecret
-mc ls local
+mcli alias set local http://localhost:9000 admin supersecret
+mcli ls local
 ```
 
 ---

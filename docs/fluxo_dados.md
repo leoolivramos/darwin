@@ -52,7 +52,7 @@ Ao criar o patch, o `generator` aciona o pipeline do GitLab CI/CD, que builda e 
 
 - Testes unitários e de carga são executados;
 - Métricas do candidato são coletadas e exportadas para Prometheus;
-- Resultados e artefatos são armazenados no MinIO (ex.: `/artifacts/tests/...`).
+- Resultados e artefatos são armazenados no Silo (ex.: `/artifacts/tests/...`).
 
 ---
 
@@ -94,7 +94,7 @@ Se a decisão for `approve_auto`, o `orchestrator` aciona o Canary Deployer:
 
 ## Auditoria e Registro
 
-Cada decisão e execução são registradas no MinIO e no banco de auditoria:
+Cada decisão e execução são registradas no Silo e no banco de auditoria:
 
 - Patch aplicado;
 - Métricas comparativas;

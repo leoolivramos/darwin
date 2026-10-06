@@ -53,7 +53,7 @@ PROMETHEUS_URL=http://prometheus:9090
 ORCHESTRATOR_URL=http://orchestrator:5003
 CHECK_INTERVAL=30
 
-🐳 Dockerfile (resumo)
+Dockerfile
 
 A imagem do detector é leve, baseada em python:3.11-slim:
 
@@ -67,19 +67,19 @@ COPY . .
 EXPOSE 5004
 CMD ["uvicorn", "detector:app", "--host", "0.0.0.0", "--port", "5004"]
 
-🧾 Exemplo de Logs
+Exemplo de Logs
 
 Durante a execução, o detector exibe logs descritivos:
 
-🚀 Detector iniciado, monitorando métricas...
-🔍 Iniciando varredura de métricas no Prometheus...
-✅ Nenhum hotspot detectado nesta varredura.
-🚨 Hotspots detectados: 2
+Detector iniciado, monitorando métricas...
+Iniciando varredura de métricas no Prometheus...
+Nenhum hotspot detectado nesta varredura.
+Hotspots detectados: 2
    -> /api/users - p95: 2.45s
    -> instance=node-1 - cpu_usage: 0.87
-📤 Enviando relatório ao Orchestrator...
+Enviando relatório ao Orchestrator...
 
-🧠 Lógica Simplificada do Detector
+Lógica Simplificada do Detector
 while True:
     coletar_métricas_prometheus()
     identificar_hotspots(latência, erro, cpu)
@@ -87,7 +87,7 @@ while True:
         enviar_para_orchestrator()
     aguardar_intervalo()
 
-🧪 Teste Local
+ Teste Local
 
 Suba o ambiente:
 
@@ -110,7 +110,7 @@ http://localhost:9090/graph
 
 Cole uma das queries do diretório queries/.
 
-🔗 Integração com o Orchestrator
+ Integração com o Orchestrator
 
 Quando um hotspot é identificado, o detector envia um POST:
 
@@ -128,10 +128,3 @@ Body exemplo:
   ],
   "timestamp": 1739238461.0
 }
-
-🧩 Futuras Expansões
-Evolução	Descrição
-🔮 Análise histórica de métricas	Criar baseline automático por hora/dia e usar regressão linear para detectar anomalias.
-🧬 Aprendizado adaptativo	Usar IA para ajustar limiares dinamicamente com base no histórico de comportamento.
-🔔 Webhooks de alerta	Integrar com Slack/Discord para alertas humanos.
-🧠 Detecção contextual	Associar hotspots a métodos/funções reais do código via traces OpenTelemetry.
