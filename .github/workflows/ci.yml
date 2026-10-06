@@ -29,6 +29,7 @@ jobs:
           - { service: evaluator, entry: evaluator.py }
           - { service: orchestrator, entry: orchestrator.py }
           - { service: sandbox-runner, entry: sandbox_runner.py }
+          - { service: telemetry-agent, entry: src/telemetry_collector.py }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,6 +54,7 @@ jobs:
           -r evaluator/requirements.txt
           -r detector/requirements.txt
           -r sandbox-runner/requirements.txt
+          -r telemetry-agent/requirements.txt
       - run: pytest tests/unit -v --cov
 
   test-integration:
