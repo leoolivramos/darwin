@@ -4,7 +4,7 @@
 
 - Docker com Compose v2
 - Python 3.10+
-- JDK 17+ e Maven (para o app)
+- JDK 21+ e Maven (para o app)
 - Git 2.25+
 
 ## Setup
