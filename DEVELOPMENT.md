@@ -1,4 +1,4 @@
-# 💻 Guia de Desenvolvimento — Código Vivo
+# Guia de Desenvolvimento — Código Vivo
 
 ## Setup do Ambiente de Desenvolvimento
 
@@ -47,7 +47,7 @@ cp .env.example .env
 
 ---
 
-## 🔧 Desenvolvimento Local
+## Desenvolvimento Local
 
 ### Opção A: Docker Compose (Recomendado)
 
@@ -150,7 +150,7 @@ LOGLEVEL=debug python orchestrator.py
 
 ---
 
-## 🧪 Testes
+## Testes
 
 ### Testes Unitários
 
@@ -207,7 +207,7 @@ start htmlcov/index.html  # Windows
 
 ---
 
-## 🔍 Code Quality
+## Code Quality
 
 ### Linting
 
@@ -266,7 +266,7 @@ autopep8 --in-place --aggressive --aggressive -r src/
 
 ---
 
-## 📊 Debugging
+## Debugging
 
 ### VS Code
 
@@ -323,7 +323,7 @@ docker-compose logs | grep ERROR
 
 ---
 
-## 🚀 Build e Distribuição
+## Build e Distribuição
 
 ### Docker Images
 
@@ -352,7 +352,7 @@ git push origin v1.0.1
 
 ---
 
-## 📝 Documentação
+## Documentação
 
 ### Gerar Docs
 
@@ -424,7 +424,7 @@ git clean -fd
 
 ---
 
-## 📚 Padrões e Convenções
+## Padrões e Convenções
 
 ### Nomes de Variáveis
 
@@ -474,7 +474,7 @@ git commit -m "aaa"
 
 ---
 
-## 🎯 Workflow Típico
+## Workflow Típico
 
 ```bash
 # 1. Crie branch
@@ -510,16 +510,16 @@ git push origin --delete feature/sua-feature
 
 ---
 
-## 💡 Dicas de Performance
+## Dicas de Performance
 
 ### Python
 
 ```python
-# Use type hints para melhor performance
+# Usa type hints para melhor performance
 def process_hotspots(metrics: Dict[str, float]) -> List[str]:
     pass
 
-# Use generators para grandes datasets
+# Usa generators para grandes datasets
 def large_dataset():
     for i in range(1_000_000):
         yield i
@@ -535,7 +535,6 @@ def expensive_query(endpoint: str) -> Dict:
 ### Java
 
 ```java
-// Use connection pooling
 @Configuration
 public class DataSourceConfig {
     @Bean
@@ -546,21 +545,8 @@ public class DataSourceConfig {
     }
 }
 
-// Use caching
 @Cacheable(value = "hotspots")
 public List<Hotspot> getHotspots() {
     return repository.findAll();
 }
 ```
-
----
-
-## 📞 Suporte
-
-- **Slack**: `#dev-help`
-- **Discussões**: GitHub Discussions
-- **Email**: dev-team@codigovivo.ai
-
----
-
-**Happy Coding! 🚀**
