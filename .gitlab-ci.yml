@@ -70,7 +70,7 @@ test:unit:
   stage: test
   image: python:3.10
   script:
-    - pip install pytest pytest-cov
+    - pip install pytest pytest-cov httpx fakeredis -r orchestrator/requirements.txt -r generator/requirements.txt -r evaluator/requirements.txt -r detector/requirements.txt -r sandbox-runner/requirements.txt
     - pytest tests/unit -v --cov
   coverage: '/TOTAL.*\s+(\d+%)$/'
   allow_failure: false
@@ -81,11 +81,11 @@ test:integration:
   services:
     - docker:dind
   script:
-    - docker-compose -f docker-compose.yml up -d
-    - sleep 10
-    - docker-compose exec -T app mvn test
-    - docker-compose down
-  allow_failure: true
+    - apk add --no-cache python3
+    - docker-compose -f docker-compose.yml up -d --build --wait
+    - python3 tests/integration/smoke_test.py
+    - docker-compose down -v
+  allow_failure: false
 
 deploy:review:
   stage: deploy
