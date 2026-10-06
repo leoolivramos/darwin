@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
-    title="Código Vivo - Telemetry Collector",
+    title="Darwin - Telemetry Collector",
     version="1.0.0",
     description="OpenTelemetry metrics, traces and logs collector"
 )

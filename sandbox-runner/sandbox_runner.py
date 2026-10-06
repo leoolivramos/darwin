@@ -37,7 +37,7 @@ BUILD_TIMEOUT = int(os.getenv("SANDBOX_BUILD_TIMEOUT", "600"))
 STARTUP_TIMEOUT = int(os.getenv("SANDBOX_STARTUP_TIMEOUT", "120"))
 JAVA_OPTS = os.getenv("SANDBOX_JAVA_OPTS", "-Xmx512m").split()
 
-app = FastAPI(title="Código Vivo - Sandbox Runner", version="1.0.0")
+app = FastAPI(title="Darwin - Sandbox Runner", version="1.0.0")
 
 RUNS_TOTAL = Counter("sandbox_runs_total", "Execuções do sandbox por resultado", ["result"])
 

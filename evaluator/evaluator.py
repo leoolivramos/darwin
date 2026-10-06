@@ -7,7 +7,7 @@ from metrics.scoring import evaluate_metrics
 from utils.report_builder import build_report
 from utils.logger import get_logger
 
-app = FastAPI(title="Código Vivo - Evaluator", version="1.0.0")
+app = FastAPI(title="Darwin - Evaluator", version="1.0.0")
 logger = get_logger("evaluator")
 
 

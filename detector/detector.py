@@ -7,7 +7,7 @@ from typing import Optional
 
 from models import Hotspot, HotspotEvent, HotspotType, DetectionResult
 
-app = FastAPI(title="Código Vivo - Hotspot Detector", version="1.0.0")
+app = FastAPI(title="Darwin - Hotspot Detector", version="1.0.0")
 
 PROMETHEUS_URL = os.getenv("PROMETHEUS_URL", "http://prometheus:9090")
 ORCHESTRATOR_URL = os.getenv("ORCHESTRATOR_URL", "http://orchestrator:5003")

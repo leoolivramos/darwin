@@ -16,7 +16,7 @@ from heuristics.timeout_rule import plan_timeout
 from heuristics.pool_size_rule import plan_pool_size
 from heuristics.caching_rule import plan_caching
 
-app = FastAPI(title="Código Vivo - Patch Generator", version="1.1.0")
+app = FastAPI(title="Darwin - Patch Generator", version="1.1.0")
 logger = get_logger("generator")
 
 REPO_PATH = os.getenv("REPO_PATH", "/repo")

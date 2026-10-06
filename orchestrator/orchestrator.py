@@ -9,7 +9,7 @@ from tasks import (
 )
 from utils.logger import get_logger
 
-app = FastAPI(title="Código Vivo - Orchestrator", version="1.0.0")
+app = FastAPI(title="Darwin - Orchestrator", version="1.0.0")
 logger = get_logger("orchestrator")
 
 
