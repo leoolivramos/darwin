@@ -6,12 +6,20 @@ import time
 
 
 class CycleState(str, Enum):
-    """Estados possíveis de um ciclo de evolução (FSM)."""
+    """Estados possíveis de um ciclo de evolução (FSM).
+
+    received → generating → validating (sandbox: build + testes + carga) → evaluating
+      → approved → deployed → (rolled_back)
+      → review (aguarda aprovação humana) → deployed | rejected
+      → rejected | failed
+    """
     RECEIVED           = "received"
     GENERATING         = "generating"
-    COLLECTING_BASELINE = "collecting_baseline"
+    VALIDATING         = "validating"
     EVALUATING         = "evaluating"
     APPROVED           = "approved"
+    DEPLOYED           = "deployed"
+    ROLLED_BACK        = "rolled_back"
     REJECTED           = "rejected"
     REVIEW             = "review"
     FAILED             = "failed"
@@ -41,14 +49,24 @@ class CycleRecord(BaseModel):
 
     # Geração
     patch_branch:  Optional[str] = None
+    patch_commit:  Optional[str] = None
     patch_file:    Optional[str] = None
+    patch_files:   list[str] = Field(default_factory=list)
+    patch_diff:    Optional[str] = None
     rule_applied:  Optional[str] = None
 
-    # Avaliação
-    baseline_metrics:  Optional[dict] = None
-    candidate_metrics: Optional[dict] = None
-    score:             Optional[float] = None
-    recommendation:    Optional[str]  = None
+    # Sandbox / avaliação
+    sandbox_run_id:     Optional[str]  = None
+    production_metrics: Optional[dict] = None   # snapshot do Prometheus (informativo)
+    baseline_metrics:   Optional[dict] = None   # medido no sandbox
+    candidate_metrics:  Optional[dict] = None   # medido no sandbox
+    score:              Optional[float] = None
+    recommendation:     Optional[str]  = None
+    evaluation:         Optional[dict] = None
+
+    # Deploy (promote em main) e rollback
+    deployment: Optional[dict] = None
+    rollback:   Optional[dict] = None
 
     # Diagnóstico
     error: Optional[str] = None
