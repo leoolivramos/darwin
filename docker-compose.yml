@@ -16,7 +16,7 @@ services:
       - minio
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.53.0
     container_name: codigo-vivo-prometheus
     volumes:
       - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -27,7 +27,7 @@ services:
       - codigo-vivo-net
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.1.0
     container_name: codigo-vivo-grafana
     ports:
       - "${GRAFANA_PORT:-3000}:3000"
@@ -44,7 +44,7 @@ services:
       - grafana_data:/var/lib/grafana
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.58
     container_name: codigo-vivo-jaeger
     ports:
       - "${JAEGER_PORT:-16686}:16686"
@@ -74,6 +74,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     networks:
       - codigo-vivo-net
 
@@ -89,6 +94,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-darwin_user} -d ${POSTGRES_DB:-darwin}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     networks:
       - codigo-vivo-net
 
@@ -142,16 +152,34 @@ services:
     container_name: codigo-vivo-orchestrator
     ports:
       - "5003:5003"
-    environment:
+    environment: &orchestrator-env
       - REDIS_URL=redis://redis:6379/0
       - GENERATOR_URL=http://generator:5002
       - EVALUATOR_URL=http://evaluator:5001
+      - SANDBOX_URL=http://sandbox-runner:9091
       - PROMETHEUS_URL=http://prometheus:9090
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-darwin}
+      - POSTGRES_USER=${POSTGRES_USER:-darwin_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-darwin_pass}
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+      - AUTO_PROMOTE=${AUTO_PROMOTE:-true}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:5003/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     depends_on:
-      - redis
-      - postgres
-      - generator
-      - evaluator
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      generator:
+        condition: service_started
+      evaluator:
+        condition: service_started
     networks:
       - codigo-vivo-net
 
@@ -159,16 +187,14 @@ services:
     build: ./orchestrator
     container_name: codigo-vivo-orchestrator-worker
     command: celery -A worker worker --loglevel=info
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - GENERATOR_URL=http://generator:5002
-      - EVALUATOR_URL=http://evaluator:5001
-      - PROMETHEUS_URL=http://prometheus:9090
-    volumes:
-      - ./repo:/repo
+    environment: *orchestrator-env
     depends_on:
-      - redis
-      - orchestrator
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      orchestrator:
+        condition: service_healthy
     networks:
       - codigo-vivo-net
 
@@ -201,7 +227,7 @@ services:
       - loki
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:3.1.0
     container_name: codigo-vivo-loki
     ports:
       - "3100:3100"
