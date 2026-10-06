@@ -4,7 +4,9 @@ from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from models import HotspotEvent
 from state import create_cycle, get_cycle, list_cycles
-from tasks import process_hotspot_task
+from tasks import (
+    process_hotspot_task, promote_cycle, rollback_cycle, reject_cycle, CycleError,
+)
 from utils.logger import get_logger
 
 app = FastAPI(title="Código Vivo - Orchestrator", version="1.0.0")
@@ -62,6 +64,31 @@ async def get_cycle_detail(cycle_id: str):
     if not cycle:
         raise HTTPException(status_code=404, detail="Ciclo de evolução não encontrado.")
     return cycle.model_dump()
+
+
+def _decision(action, cycle_id: str, *args):
+    try:
+        return action(cycle_id, *args).model_dump()
+    except CycleError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@app.post("/cycles/{cycle_id}/approve")
+async def approve_cycle(cycle_id: str):
+    """Aprovação humana: promove o patch para main."""
+    return _decision(promote_cycle, cycle_id)
+
+
+@app.post("/cycles/{cycle_id}/reject")
+async def reject_cycle_endpoint(cycle_id: str, reason: str = "Rejeitado por revisão humana"):
+    return _decision(reject_cycle, cycle_id, reason)
+
+
+@app.post("/cycles/{cycle_id}/rollback")
+async def rollback_cycle_endpoint(cycle_id: str):
+    return _decision(rollback_cycle, cycle_id)
 
 
 @app.get("/metrics")
