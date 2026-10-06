@@ -1,4 +1,4 @@
-codigo-vivo/
+darwin/
 │
 ├── .env.example  --              # Exemplo de variáveis de ambiente (NÃO COMMITAR .env real)
 ├── docker-compose.yml     --     # Orquestração principal
@@ -33,8 +33,8 @@ codigo-vivo/
 │   └── config.json
 │
 ├── runtime-app/       --         # Aplicação alvo (o “organismo vivo”)
-│   ├── src/main/java/com/example/codigovivo/
-│   │   ├── CodigoVivoApplication.java
+│   ├── src/main/java/com/example/darwin/
+│   │   ├── DarwinApplication.java
 │   │   ├── controller/
 │   │   ├── service/
 │   │   ├── repository/
