@@ -75,8 +75,7 @@ class TestHotspotDetection:
 
 class TestPrometheusQuery:
     """Testes para queries ao Prometheus"""
-    @pytest.mark.asyncio
-    async def test_valid_prometheus_response(self):
+    def test_valid_prometheus_response(self):
         """Verifica parsing de resposta válida do Prometheus"""
         response = {
             "status": "success",
@@ -95,14 +94,12 @@ class TestPrometheusQuery:
         assert len(response["data"]["result"]) == 1
         assert response["data"]["result"][0]["value"][1] == "1250"
 
-    @pytest.mark.asyncio
-    async def test_prometheus_connection_error(self):
+    def test_prometheus_connection_error(self):
         """Verifica tratamento de erro de conexão"""
         with pytest.raises(ConnectionError):
             raise ConnectionError("Failed to connect to Prometheus")
 
-    @pytest.mark.asyncio
-    async def test_prometheus_timeout(self):
+    def test_prometheus_timeout(self):
         """Verifica tratamento de timeout"""
         with pytest.raises(TimeoutError):
             raise TimeoutError("Prometheus query timeout")
