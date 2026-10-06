@@ -20,7 +20,7 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: minio-pvc
+  name: silo-pvc
   namespace: darwin
 spec:
   accessModes:

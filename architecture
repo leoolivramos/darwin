@@ -15,9 +15,7 @@ darwin/
 │   │   └── dashboards/
 │   ├── jaeger/
 │   │   └── config.yaml
-│   ├── minio/
-│   │   ├── Dockerfile
-│   │   ├── init.sh
+│   ├── silo/
 │   │   └── data/               # Montado como volume
 │   └── k8s/                    # Manifests (para deploy real em cluster)
 │       ├── app-deploy.yaml

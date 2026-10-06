@@ -3,7 +3,7 @@ from datetime import datetime
 
 def build_report(result: dict) -> dict:
     """
-    Gera um relatório final padronizado e auditável para armazenamento no MinIO / DB.
+    Gera um relatório final padronizado e auditável para armazenamento no Silo / DB.
     """
     return {
         "timestamp": datetime.now().isoformat(),

@@ -14,5 +14,6 @@ repo/
 .pytest_cache/
 .coverage
 
-# MinIO runtime data
+# Silo & MinIO runtime data
+infra/silo/data/
 infra/minio/data/

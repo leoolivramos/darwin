@@ -13,7 +13,7 @@ services:
       - darwin-net
     depends_on:
       - prometheus
-      - minio
+      - silo
 
   prometheus:
     image: prom/prometheus:v2.53.0
@@ -53,9 +53,10 @@ services:
     networks:
       - darwin-net
 
-  minio:
-    build: ./infra/minio
-    container_name: darwin-minio
+  silo:
+    image: pgsty/silo:RELEASE.2026-09-16T00-00-00Z
+    container_name: darwin-silo
+    command: server /data --console-address ":9001"
     ports:
       - "${MINIO_PORT:-9000}:9000"
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
@@ -63,7 +64,7 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
     volumes:
-      - minio_data:/data
+      - silo_data:/data
     networks:
       - darwin-net
 
@@ -145,7 +146,7 @@ services:
       - darwin-net
     depends_on:
       - prometheus
-      - minio
+      - silo
 
   orchestrator:
     build: ./orchestrator
@@ -162,7 +163,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB:-darwin}
       - POSTGRES_USER=${POSTGRES_USER:-darwin_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-darwin_pass}
-      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ENDPOINT=http://silo:9000
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
       - AUTO_PROMOTE=${AUTO_PROMOTE:-true}
@@ -246,7 +247,7 @@ volumes:
   prometheus_data:
   grafana_data:
   loki_data:
-  minio_data:
+  silo_data:
   redis_data:
   postgres_data:
   maven_cache:

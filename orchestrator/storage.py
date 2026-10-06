@@ -1,5 +1,5 @@
 """
-Armazenamento de artefatos dos ciclos no MinIO (S3 compatível).
+Armazenamento de artefatos dos ciclos no Silo (S3 compatível).
 
 Buckets:
   - patches   → diff de cada patch gerado
@@ -32,7 +32,7 @@ def _get_client():
     if _client is None:
         from minio import Minio
 
-        endpoint = os.getenv("MINIO_ENDPOINT", "http://minio:9000")
+        endpoint = os.getenv("MINIO_ENDPOINT", "http://silo:9000")
         secure = endpoint.startswith("https://")
         host = endpoint.replace("https://", "").replace("http://", "").rstrip("/")
         _client = Minio(
@@ -56,7 +56,7 @@ def _put(bucket: str, key: str, data: bytes, content_type: str) -> Optional[str]
         client.put_object(bucket, key, io.BytesIO(data), len(data), content_type=content_type)
         return f"s3://{bucket}/{key}"
     except Exception as e:  # noqa: BLE001
-        logger.warning(f"⚠️ MinIO indisponível ({bucket}/{key}): {e}")
+        logger.warning(f"⚠️ Silo indisponível ({bucket}/{key}): {e}")
         return None
 
 
