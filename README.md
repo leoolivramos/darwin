@@ -68,4 +68,3 @@ python tests/integration/smoke_test.py   # com a stack no ar
 
 - [DEVELOPMENT.md](DEVELOPMENT.md): ambiente de desenvolvimento
 - [docs/arquitetura.md](docs/arquitetura.md): arquitetura
-- [docs/design_decisions.md](docs/design_decisions.md): decisões de projeto
