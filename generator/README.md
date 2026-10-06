@@ -1,10 +1,10 @@
-# 🧠 Darwin – Generator
+# Darwin – Generator
 
 O **Generator** é o módulo responsável por **propor e aplicar mudanças no código‑fonte**, baseando‑se em heurísticas determinísticas ou em modelos de IA. É o **núcleo evolutivo** do sistema — onde o código “muta” para se adaptar a problemas reais detectados em produção.
 
 ---
 
-## ⚙️ Função
+## Função
 
 1. Recebe *hotspots* do **Orchestrator**.  
 2. Identifica o arquivo mais relevante (via análise AST).  
@@ -14,7 +14,7 @@ O **Generator** é o módulo responsável por **propor e aplicar mudanças no c�
 
 ---
 
-## 📂 Estrutura
+## Estrutura
 
 ```
 generator/
@@ -34,14 +34,14 @@ generator/
 
 ---
 
-## 🔗 Comunicação
+## Comunicação
 
 - Recebe de: `orchestrator` (`POST /generate`)  
 - Envia para: `evaluator` (`POST /evaluate`) *(indireto, via orchestrator)*
 
 ---
 
-## 🧩 Modos de Operação
+## Modos de Operação
 
 | Modo | Descrição |
 |------|-----------|
@@ -50,7 +50,7 @@ generator/
 
 ---
 
-## 🧪 Exemplo de Execução
+## Exemplo de Execução
 
 Entrada (hotspot):
 ```json
@@ -72,10 +72,10 @@ Saída (branch gerado):
 
 ---
 
-## 🧭 Futuras Expansões
+## Futuras Expansões
 
-- 🔬 Análise AST mais precisa (ex.: JavaParser via subprocesso).  
-- 🧠 Fine‑tuning de LLMs usando commits históricos.  
-- 📊 Feedback loop com métricas do Evaluator para aprendizado adaptativo.
+- Análise AST mais precisa (ex.: JavaParser via subprocesso).  
+- Fine‑tuning de LLMs usando commits históricos.  
+- Feedback loop com métricas do Evaluator para aprendizado adaptativo.
 
 ---

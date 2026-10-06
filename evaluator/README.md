@@ -1,4 +1,4 @@
-# ⚖️ Darwin – Evaluator
+# Darwin – Evaluator
 
 O Evaluator é o módulo responsável por comparar o desempenho entre uma versão baseline e uma versão candidata. Ele analisa métricas como latência, erro e uso de CPU, calcula um score ponderado e decide se a alteração deve ser:
 - `approve_auto` — melhoria significativa e sem erros
@@ -7,7 +7,7 @@ O Evaluator é o módulo responsável por comparar o desempenho entre uma versã
 
 ---
 
-## ⚙️ Estrutura do projeto
+## Estrutura do projeto
 
 ```
 evaluator/
@@ -24,7 +24,7 @@ evaluator/
 
 ---
 
-## 🧮 Fórmula de avaliação
+## Fórmula de avaliação
 
 score = (Δlatência * 0.5) + (Δerro * 0.3) + (ΔCPU * 0.2)
 
@@ -85,7 +85,7 @@ Resposta de exemplo
 
 ---
 
-## 🚀 Execução (local / Docker)
+## Execução (local / Docker)
 
 Build e run com Docker:
 ```bash
@@ -102,7 +102,7 @@ curl -X POST http://localhost:5001/evaluate \
 
 ---
 
-## 🧭 Integração
+## Integração
 
 - Recebe chamadas do Orchestrator via POST /evaluate.
 - Retorna decisão e score para guiar o Canary Deployer.
@@ -110,10 +110,8 @@ curl -X POST http://localhost:5001/evaluate \
 
 ---
 
-## 🔮 Futuras expansões
+## Futuras expansões
 
 - Integração com Prometheus para baselines dinâmicos.
 - Regressão temporal e thresholds adaptativos por aprendizado.
 - Análise multivariada de custo e performance.
-
-<!-- Fim -->

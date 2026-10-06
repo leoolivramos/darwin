@@ -1,4 +1,4 @@
-# 🧩 Arquitetura do Sistema — Projeto “Darwin”
+# Arquitetura do Sistema — Projeto “Darwin”
 
 ## 1. Visão Geral
 
@@ -23,14 +23,14 @@ O sistema é dividido em **quatro camadas principais**:
 
 ## 3. Componentes Principais
 
-### 🧠 3.1. Runtime App (Organismo Vivo)
+### 3.1. Runtime App (Organismo Vivo)
 - Aplicação base em **Spring Boot**, representando um sistema real (serviços REST, banco de dados, etc.).
 - Instrumentado com **Micrometer** para coletar métricas como latência, erro e throughput.
 - Arquivo `HttpClientConfig.java` serve como ponto de mutação controlada — o sistema poderá alterar suas configurações automaticamente.
 
 ---
 
-### 📡 3.2. Telemetria & Monitoramento
+### 3.2. Telemetria & Monitoramento
 - **Prometheus** coleta métricas expostas pela aplicação (`/actuator/prometheus`).
 - **Grafana** visualiza a evolução das métricas.
 - **Jaeger** captura traces distribuídos.
@@ -40,7 +40,7 @@ Esses componentes formam a base para a detecção de *hotspots* e análise de de
 
 ---
 
-### 🔎 3.3. Detector (Hotspot Detector)
+### 3.3. Detector (Hotspot Detector)
 - Serviço que consulta periodicamente o Prometheus e identifica endpoints ou métodos com degradação de performance.
 - Exemplo de regra (PromQL):
 
@@ -53,7 +53,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
 
 ---
 
-### 🧬 3.4. Generator (Gerador de Patches)
+### 3.4. Generator (Gerador de Patches)
 - Responsável por criar modificações no código-fonte com base em heurísticas pré-definidas ou IA.
 - Utiliza:
     - **JavaParser** para análise e manipulação de AST (Abstract Syntax Tree).
@@ -62,7 +62,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
 
 ---
 
-### ⚗️ 3.5. Sandbox Runner
+### 3.5. Sandbox Runner
 - Cada `candidate` branch é compilado e testado isoladamente.
 - A infraestrutura é gerenciada via **GitLab CI/CD** e **Docker**.
 - Executa:
@@ -73,7 +73,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
 
 ---
 
-### ⚖️ 3.6. Evaluator
+### 3.6. Evaluator
 - Analisa os resultados de desempenho do *candidate* versus o *baseline*.
 - Calcula um **score de melhoria**, com base em métricas ponderadas:
     - Δ Latência (p95)
@@ -85,7 +85,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
 
 ---
 
-### 🧩 3.7. Orchestrator
+### 3.7. Orchestrator
 - Coordena todo o ciclo:
     1. Recebe alerta do Detector.
     2. Solicita patch ao Generator.
@@ -97,7 +97,7 @@ and histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) 
 
 ---
 
-### 🛡️ 3.8. Governance & Audit
+### 3.8. Governance & Audit
 - Registra todas as execuções, decisões e artefatos.
 - Garante:
     - Reprodutibilidade

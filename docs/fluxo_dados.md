@@ -1,4 +1,4 @@
-# 🔄 Fluxo de Dados — Sistema “Darwin”
+# Fluxo de Dados — Sistema “Darwin”
 
 ## Visão Resumida
 
@@ -6,7 +6,7 @@ O fluxo de dados descreve o caminho desde a execução da aplicação principal 
 
 ---
 
-## 1️⃣ Runtime → Telemetria
+## Runtime → Telemetria
 
 A aplicação principal (Spring Boot) expõe métricas via Micrometer no endpoint `/actuator/prometheus`. Essas métricas incluem:
 
@@ -19,7 +19,7 @@ O Prometheus realiza scrapes periódicos dessas métricas.
 
 ---
 
-## 2️⃣ Telemetria → Detector
+## Telemetria → Detector
 
 O serviço `detector` consulta o Prometheus (`/api/v1/query`) usando consultas .promql, por exemplo:
 
@@ -31,7 +31,7 @@ As consultas são avaliadas em intervalos (ex.: 30s). Se o detector identificar 
 
 ---
 
-## 3️⃣ Detector → Generator
+## Detector → Generator
 
 O `orchestrator` recebe o evento de hotspot e repassa para o serviço `generator`. Exemplo do payload:
 
@@ -46,7 +46,7 @@ O `generator` analisa o código-fonte e aplica heurísticas (AST) para criar um 
 
 ---
 
-## 4️⃣ Generator → Sandbox Runner
+## Generator → Sandbox Runner
 
 Ao criar o patch, o `generator` aciona o pipeline do GitLab CI/CD, que builda e executa o candidato em ambiente isolado. Durante a execução:
 
@@ -56,7 +56,7 @@ Ao criar o patch, o `generator` aciona o pipeline do GitLab CI/CD, que builda e 
 
 ---
 
-## 5️⃣ Sandbox → Evaluator
+## Sandbox → Evaluator
 
 O `evaluator` recebe métricas baseline e candidate em JSON, por exemplo:
 
@@ -81,7 +81,7 @@ A decisão é classificada como:
 
 ---
 
-## 6️⃣ Evaluator → Orchestrator → Deployer
+## Evaluator → Orchestrator → Deployer
 
 Se a decisão for `approve_auto`, o `orchestrator` aciona o Canary Deployer:
 
@@ -92,7 +92,7 @@ Se a decisão for `approve_auto`, o `orchestrator` aciona o Canary Deployer:
 
 ---
 
-## 7️⃣ Auditoria e Registro
+## Auditoria e Registro
 
 Cada decisão e execução são registradas no MinIO e no banco de auditoria:
 
@@ -106,7 +106,7 @@ Esses dados podem ser consultados via painel Grafana ou API interna do `orchestr
 
 ---
 
-## 🔁 Fechando o Ciclo
+## Fechando o Ciclo
 
 O sistema retorna ao início, reiniciando o monitoramento com a nova versão. Cada iteração representa uma “geração evolutiva” do software.
 

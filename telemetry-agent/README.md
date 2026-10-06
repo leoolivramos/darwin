@@ -1,8 +1,8 @@
-# 📊 Telemetry Agent — Coletor de Observabilidade
+# Telemetry Agent — Coletor de Observabilidade
 
 O **Telemetry Agent** é um serviço Python responsável por coletar métricas, logs e traces distribuídos da aplicação e exportá-los para os sistemas de observabilidade (Prometheus, Loki, Jaeger).
 
-## 🎯 Responsabilidades
+## Responsabilidades
 
 - Coletar métricas da aplicação via Micrometer/client libraries
 - Exportar métricas para Prometheus
@@ -10,21 +10,21 @@ O **Telemetry Agent** é um serviço Python responsável por coletar métricas, 
 - Rastrear distribuído com Jaeger
 - Garantir coleta sem perda de dados
 
-## 🛠️ Stack Técnico
+## Stack Técnico
 
 - **Framework**: Instrumentation Agent / OpenTelemetry SDK
 - **Exportadores**: Prometheus, Loki, Jaeger
 - **Linguagem**: Python 3.10+
 - **Protocolos**: gRPC, HTTP, UDP
 
-## 📋 Instalação
+## Instalação
 
 ```bash
 cd telemetry-agent
 pip install -r requirements.txt
 ```
 
-## ⚙️ Configuração
+## Configuração
 
 Variáveis de ambiente:
 
@@ -35,7 +35,7 @@ PROMETHEUS_ENDPOINT=http://prometheus:9090
 LOG_LEVEL=INFO
 ```
 
-## 🚀 Execução
+## Execução
 
 ### Local
 
@@ -52,7 +52,7 @@ docker run -e JAEGER_ENDPOINT=http://jaeger:14268/api/traces \
            darwin-telemetry
 ```
 
-## 📡 Exportadores
+## Exportadores
 
 ### Prometheus Exporter
 - Porta: 8000
@@ -69,7 +69,7 @@ docker run -e JAEGER_ENDPOINT=http://jaeger:14268/api/traces \
 - Protocolo: HTTP Push
 - Rótulos: service, environment, level
 
-## 🔍 Métricas Coletadas
+## Métricas Coletadas
 
 - **HTTP**: latência, status codes, throughput
 - **JVM**: heap, threads, GC
@@ -77,21 +77,21 @@ docker run -e JAEGER_ENDPOINT=http://jaeger:14268/api/traces \
 - **Cache**: hit rate, evictions
 - **Custom**: métricas da aplicação
 
-## 🧪 Testes
+## Testes
 
 ```bash
 pytest tests/unit -v
 pytest tests/integration -v
 ```
 
-## 🔐 Segurança
+## Segurança
 
 - TLS opcional para OTLP
 - Validação de endpoints
 - Sem PII nos logs/traces
 - Redação de dados sensíveis
 
-## 📚 Documentação Adicional
+## Documentação Adicional
 
 - [OpenTelemetry](https://opentelemetry.io)
 - [Jaeger Documentation](https://www.jaegertracing.io/docs)
