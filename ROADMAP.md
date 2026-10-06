@@ -332,7 +332,7 @@ Para contribuidores interessados:
 ### Contribuidores
 ```bash
 # Fork o repositório
-git clone https://github.com/seu-usuario/codigo-vivo.git
+git clone https://github.com/leoolivramos/darwin.git
 
 # Escolha um issue do roadmap
 # Abra um PR com:
@@ -342,7 +342,7 @@ git clone https://github.com/seu-usuario/codigo-vivo.git
 # 4. Documentação
 
 # Participe das discussões
-# github.com/codigo-vivo/codigo-vivo/discussions
+# github.com/leoolivramos/darwin/discussions
 ```
 
 ### Enterprise

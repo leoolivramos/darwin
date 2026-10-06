@@ -17,8 +17,8 @@
 
 ```bash
 # Clone o repositório
-git clone https://github.com/codigo-vivo/codigo-vivo.git
-cd codigo-vivo
+git clone https://github.com/leoolivramos/darwin.git
+cd darwin
 
 # Setup Python venv
 python3 -m venv venv

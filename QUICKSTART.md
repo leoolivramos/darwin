@@ -13,7 +13,7 @@
 
 ```bash
 git clone <repo-url> codigo-vivo
-cd codigo-vivo
+cd darwin
 ```
 
 ### Copie o arquivo de ambiente

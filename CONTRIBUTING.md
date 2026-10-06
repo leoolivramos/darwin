@@ -24,8 +24,8 @@ Antes de começar a trabalhar, crie uma issue descrevendo:
 ### 2. Fork e Clone
 
 ```bash
-git clone https://github.com/seuusuario/codigo-vivo.git
-cd codigo-vivo
+git clone https://github.com/leoolivramos/darwin.git
+cd darwin
 git checkout -b feature/sua-feature
 ```
 
