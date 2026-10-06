@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: codigo-vivo
+  name: darwin
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: codigo-vivo-env
-  namespace: codigo-vivo
+  name: darwin-env
+  namespace: darwin
 data:
   APP_ENV: "production"
   PROMETHEUS_URL: "http://prometheus:9090"
@@ -21,7 +21,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: minio-pvc
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   accessModes:
     - ReadWriteOnce
@@ -33,26 +33,26 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: codigo-vivo-app
-  namespace: codigo-vivo
+  name: darwin-app
+  namespace: darwin
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: codigo-vivo-app
+      app: darwin-app
   template:
     metadata:
       labels:
-        app: codigo-vivo-app
+        app: darwin-app
     spec:
       containers:
       - name: app
-        image: codigo-vivo/app:latest
+        image: darwin/app:latest
         ports:
         - containerPort: 8080
         envFrom:
         - configMapRef:
-            name: codigo-vivo-env
+            name: darwin-env
         resources:
           requests:
             memory: "256Mi"
@@ -77,12 +77,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: codigo-vivo-app
-  namespace: codigo-vivo
+  name: darwin-app
+  namespace: darwin
 spec:
   type: LoadBalancer
   selector:
-    app: codigo-vivo-app
+    app: darwin-app
   ports:
   - protocol: TCP
     port: 80
@@ -93,7 +93,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: detector
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   replicas: 1
   selector:
@@ -106,12 +106,12 @@ spec:
     spec:
       containers:
       - name: detector
-        image: codigo-vivo/detector:latest
+        image: darwin/detector:latest
         ports:
         - containerPort: 5004
         envFrom:
         - configMapRef:
-            name: codigo-vivo-env
+            name: darwin-env
         resources:
           requests:
             memory: "128Mi"
@@ -125,7 +125,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: detector
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   selector:
     app: detector
@@ -139,7 +139,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: generator
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   replicas: 2
   selector:
@@ -152,12 +152,12 @@ spec:
     spec:
       containers:
       - name: generator
-        image: codigo-vivo/generator:latest
+        image: darwin/generator:latest
         ports:
         - containerPort: 5002
         envFrom:
         - configMapRef:
-            name: codigo-vivo-env
+            name: darwin-env
         resources:
           requests:
             memory: "512Mi"
@@ -171,7 +171,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: generator
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   selector:
     app: generator
@@ -185,7 +185,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: evaluator
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   replicas: 2
   selector:
@@ -198,12 +198,12 @@ spec:
     spec:
       containers:
       - name: evaluator
-        image: codigo-vivo/evaluator:latest
+        image: darwin/evaluator:latest
         ports:
         - containerPort: 5001
         envFrom:
         - configMapRef:
-            name: codigo-vivo-env
+            name: darwin-env
         resources:
           requests:
             memory: "256Mi"
@@ -217,7 +217,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: evaluator
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   selector:
     app: evaluator
@@ -231,7 +231,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: orchestrator
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   replicas: 1
   selector:
@@ -244,12 +244,12 @@ spec:
     spec:
       containers:
       - name: orchestrator
-        image: codigo-vivo/orchestrator:latest
+        image: darwin/orchestrator:latest
         ports:
         - containerPort: 5003
         envFrom:
         - configMapRef:
-            name: codigo-vivo-env
+            name: darwin-env
         resources:
           requests:
             memory: "256Mi"
@@ -263,7 +263,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: orchestrator
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   selector:
     app: orchestrator
@@ -277,7 +277,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: generator-hpa
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -298,7 +298,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: evaluator-hpa
-  namespace: codigo-vivo
+  namespace: darwin
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

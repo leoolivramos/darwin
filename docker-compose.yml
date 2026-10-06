@@ -2,7 +2,7 @@ services:
 
   app:
     build: ./app
-    container_name: codigo-vivo-app
+    container_name: darwin-app
     ports:
       - "${APP_PORT:-8080}:8080"
     environment:
@@ -10,25 +10,25 @@ services:
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=prometheus,health,info
       - SPRING_PROFILES_ACTIVE=local
     networks:
-      - codigo-vivo-net
+      - darwin-net
     depends_on:
       - prometheus
       - minio
 
   prometheus:
     image: prom/prometheus:v2.53.0
-    container_name: codigo-vivo-prometheus
+    container_name: darwin-prometheus
     volumes:
       - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     ports:
       - "${PROMETHEUS_PORT:-9090}:9090"
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   grafana:
     image: grafana/grafana:11.1.0
-    container_name: codigo-vivo-grafana
+    container_name: darwin-grafana
     ports:
       - "${GRAFANA_PORT:-3000}:3000"
     depends_on:
@@ -38,24 +38,24 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
-      - codigo-vivo-net
+      - darwin-net
     volumes:
       - ./infra/grafana/dashboards:/var/lib/grafana/dashboards
       - grafana_data:/var/lib/grafana
 
   jaeger:
     image: jaegertracing/all-in-one:1.58
-    container_name: codigo-vivo-jaeger
+    container_name: darwin-jaeger
     ports:
       - "${JAEGER_PORT:-16686}:16686"
       - "6831:6831/udp"
       - "6832:6832/udp"
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   minio:
     build: ./infra/minio
-    container_name: codigo-vivo-minio
+    container_name: darwin-minio
     ports:
       - "${MINIO_PORT:-9000}:9000"
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
@@ -65,11 +65,11 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   redis:
     image: redis:7-alpine
-    container_name: codigo-vivo-redis
+    container_name: darwin-redis
     ports:
       - "6379:6379"
     volumes:
@@ -80,11 +80,11 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   postgres:
     image: postgres:16-alpine
-    container_name: codigo-vivo-postgres
+    container_name: darwin-postgres
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-darwin}
       - POSTGRES_USER=${POSTGRES_USER:-darwin_user}
@@ -100,11 +100,11 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   detector:
     build: ./detector
-    container_name: codigo-vivo-detector
+    container_name: darwin-detector
     ports:
       - "5004:5004"
     environment:
@@ -113,22 +113,22 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - CHECK_INTERVAL=30
     networks:
-      - codigo-vivo-net
+      - darwin-net
     depends_on:
       - prometheus
       - redis
 
   evaluator:
     build: ./evaluator
-    container_name: codigo-vivo-evaluator
+    container_name: darwin-evaluator
     ports:
       - "5001:5001"
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   generator:
     build: ./generator
-    container_name: codigo-vivo-generator
+    container_name: darwin-generator
     ports:
       - "5002:5002"
     environment:
@@ -142,14 +142,14 @@ services:
       - ./repo:/repo
       - ./app:/app-src:ro
     networks:
-      - codigo-vivo-net
+      - darwin-net
     depends_on:
       - prometheus
       - minio
 
   orchestrator:
     build: ./orchestrator
-    container_name: codigo-vivo-orchestrator
+    container_name: darwin-orchestrator
     ports:
       - "5003:5003"
     environment: &orchestrator-env
@@ -181,11 +181,11 @@ services:
       evaluator:
         condition: service_started
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   orchestrator-worker:
     build: ./orchestrator
-    container_name: codigo-vivo-orchestrator-worker
+    container_name: darwin-orchestrator-worker
     command: celery -A worker worker --loglevel=info
     environment: *orchestrator-env
     depends_on:
@@ -196,11 +196,11 @@ services:
       orchestrator:
         condition: service_healthy
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   sandbox-runner:
     build: ./sandbox-runner
-    container_name: codigo-vivo-sandbox-runner
+    container_name: darwin-sandbox-runner
     ports:
       - "9091:9091"
     environment:
@@ -210,25 +210,25 @@ services:
       - ./repo:/repo:ro
       - maven_cache:/root/.m2
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
   telemetry-agent:
     build: ./telemetry-agent
-    container_name: codigo-vivo-telemetry-agent
+    container_name: darwin-telemetry-agent
     environment:
       - JAEGER_ENDPOINT=http://jaeger:14268/api/traces
       - LOKI_ENDPOINT=http://loki:3100
       - PROMETHEUS_ENDPOINT=http://prometheus:9090
       - LOG_LEVEL=INFO
     networks:
-      - codigo-vivo-net
+      - darwin-net
     depends_on:
       - jaeger
       - loki
 
   loki:
     image: grafana/loki:3.1.0
-    container_name: codigo-vivo-loki
+    container_name: darwin-loki
     ports:
       - "3100:3100"
     volumes:
@@ -236,10 +236,10 @@ services:
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yml
     networks:
-      - codigo-vivo-net
+      - darwin-net
 
 networks:
-  codigo-vivo-net:
+  darwin-net:
     driver: bridge
 
 volumes:

@@ -13,12 +13,12 @@ spec:
     spec:
       containers:
         - name: evaluator
-          image: codigo-vivo/evaluator:latest
+          image: darwin/evaluator:latest
           ports:
             - containerPort: 5001
           envFrom:
             - secretRef:
-                name: codigo-vivo-secrets
+                name: darwin-secrets
 ---
 apiVersion: v1
 kind: Service

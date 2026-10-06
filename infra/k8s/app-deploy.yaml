@@ -1,35 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: codigo-vivo-app
+  name: darwin-app
   labels:
-    app: codigo-vivo
+    app: darwin
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: codigo-vivo
+      app: darwin
   template:
     metadata:
       labels:
-        app: codigo-vivo
+        app: darwin
     spec:
       containers:
         - name: app
-          image: codigo-vivo/app:latest
+          image: darwin/app:latest
           ports:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: codigo-vivo-secrets
+                name: darwin-secrets
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: codigo-vivo-app
+  name: darwin-app
 spec:
   selector:
-    app: codigo-vivo
+    app: darwin
   ports:
     - port: 8080
       targetPort: 8080

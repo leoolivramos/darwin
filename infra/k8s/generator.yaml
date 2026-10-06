@@ -13,12 +13,12 @@ spec:
     spec:
       containers:
         - name: generator
-          image: codigo-vivo/generator:latest
+          image: darwin/generator:latest
           ports:
             - containerPort: 5002
           envFrom:
             - secretRef:
-                name: codigo-vivo-secrets
+                name: darwin-secrets
 ---
 apiVersion: v1
 kind: Service

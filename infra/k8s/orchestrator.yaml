@@ -13,12 +13,12 @@ spec:
     spec:
       containers:
         - name: orchestrator
-          image: codigo-vivo/orchestrator:latest
+          image: darwin/orchestrator:latest
           ports:
             - containerPort: 5003
           envFrom:
             - secretRef:
-                name: codigo-vivo-secrets
+                name: darwin-secrets
 ---
 apiVersion: v1
 kind: Service
